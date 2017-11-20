@@ -11,5 +11,8 @@
   "dependencies": {
     "google-auth-library": "^0.11.0",
     "googleapis": "^22.2.0"
+  },
+  "devDependencies": {
+    "google-spreadsheet-to-json": "^1.0.0"
   }
 }

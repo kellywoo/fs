@@ -26,12 +26,15 @@ function readFromDictionary () {
     });
   })
 }
+function includes (p){
+  return included.some((v) => p.toString().match(v));
+}
 
 function eachFileNameHandler (p) {
   return new Promise((res) => {
     fs.stat(p, function (err, stats) {
       if ( stats.isFile() ) {
-        if ( included.some((v) => p.toString().match(v)) ) {
+        if (includes(p) ) {
           readFile(p, data)
             .then(() => {
               res(false)
@@ -78,7 +81,7 @@ function readFile (p) {
           if ( data[ str ] ) {
             data[ str ][ 'map' ].push(_filename);
           } else {
-            unlisted[ str ] = unlisted[ str ] || { map: [] };
+            unlisted[ str ] = unlisted[ str ] || { key: str, map: [] };
             unlisted[ str ][ 'map' ].push(_filename);
           }
         })
@@ -98,27 +101,26 @@ function readFromDir () {
   })
 }
 
-function toGoogleSheet () {
+function toGoogleSheet (dic) {
+  console.log('dic', dic)
   return new Promise((resolve) => {
-    console.log('toGoogleSheet')
     doc.useServiceAccountAuth(creds, function (err) {
-      let keys = Object.keys(data);
-      addRow(keys, 0).then(() => {
+      let keys = Object.keys(dic);
+      addRow(dic, keys, 0).then(() => {
         resolve('finished');
       });
     })
   })
 }
 
-function addRow (keys, n) {
-  console.log(keys,n);
+function addRow (dic,keys, n) {
   return new Promise((resolve, reject) => {
-    doc.addRow(1, data[ keys[ n ] ], function (err) {
+    doc.addRow(1, dic[ keys[ n ] ], function (err) {
       if ( err ) {
         return
       }
       if ( n < keys.length ) {
-        resolve(addRow(keys, n + 1));
+        resolve(addRow(dic, keys, n + 1));
       } else {
         resolve()
       }
@@ -133,7 +135,7 @@ readFromDictionary()
     return readFromDir()
   })
   .then(() => {
-    return toGoogleSheet();
+    return toGoogleSheet(unlisted);
   })
   .then((res) => {
     console.log(res);
