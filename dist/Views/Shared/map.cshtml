@@ -1,0 +1,61 @@
+﻿@using mtopt.logic;
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    @if (mtopt.logic.Config.AppSettings.cdn_node == true)
+    {
+        <script src="@(mtopt.logic.Config.AppSettings.cdn_host)/cdn/mtopt-2.1-min.js"></script>
+    }
+    else
+    {
+        <script src="~/Scripts/mtopt-2.1-min.js"></script>
+    }
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=43fe578f923c7c027e96d3ebf115e053"></script>
+    <style type="text/css">
+        body, html, #stage {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            font-family: "微软雅黑";
+        }
+    </style>
+    <title>@Basis.Parse.Localization("com_show_map")</title>
+</head>
+<body>
+    <div id="stage"></div>
+</body>
+</html>
+<script type="text/javascript">
+    var pck = {
+        x: 0,
+        y: 0,
+        init: function () {
+            this.x = m.parse.toDecimal(m.queryString("x"));
+            this.y = m.parse.toDecimal(m.queryString("y"));
+        }
+    }
+    pck.init();
+    //初始化系统
+    m.event("ready").add(function () {
+        var map = new BMap.Map("stage");
+        map.centerAndZoom(new BMap.Point(pck.x, pck.y), 11);
+        map.addControl(new BMap.NavigationControl({
+            anchor: BMAP_ANCHOR_TOP_LEFT,
+            type: BMAP_NAVIGATION_CONTROL_LARGE,
+            enableGeolocation: true
+        }));
+        map.addOverlay(new BMap.Marker(new BMap.Point(pck.x, pck.y)));
+        map.centerAndZoom(point, 13);
+        map.addControl(new BMap.MapTypeControl({ mapTypes: [BMAP_NORMAL_MAP, BMAP_HYBRID_MAP] }));
+        map.addControl(new BMap.OverviewMapControl());
+        map.setCurrentCity("北京");
+        map.enableScrollWheelZoom(true);
+    });
+</script>
+

@@ -1,17 +1,15 @@
 const fs = require('fs');
-const path = require('path');
 const spreadsheet = require('google-spreadsheet');
 const gsjson = require('google-spreadsheet-to-json')
 const creds = require('./client_secret.json');
-const doc = new spreadsheet('1CstBjsjIxj02LwoG0Bx63jg6sFNctZzM9c3-9--Zu7I');
 
 
 function toGoogleSheet (dic) {
   return new Promise((resolve) => {
     gsjson({
-      spreadsheetId: '1CstBjsjIxj02LwoG0Bx63jg6sFNctZzM9c3-9--Zu7I',
+      spreadsheetId: '1v383oZPJLA216aCYnlP4GIAzJIXtSWjLP8wEQsbqf1g',
       hash: 'key',
-      exclude: ['key'],
+      exclude: ['map','desc','key'],
       credentials: creds
     })
       .then(function(result) {

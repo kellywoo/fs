@@ -1,0 +1,38 @@
+﻿@using mtopt.logic;
+@{
+    ViewBag.Title = Basis.Parse.Localization("error_405_title");
+}
+<html lang="zh-cmn-Hans">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    @{ Html.RenderPartial("~/Views/Shared/ctl_keywords.cshtml"); }
+    <title>@Basis.Parse.Localization("error_405_desc_1")</title>
+    <link href="~/Scripts/mtopt/ui-2.0-min.css" rel="stylesheet" />
+
+    <script src="~/Scripts/mtopt-2.1-min.js"></script>
+    <script src="~/Scripts/mtopt/ui-2.0-min.js"></script>
+    <style type="text/css">
+        html, body {
+            color: #fff;
+            background: #47aadd;
+        }
+        .help-head{font-size:38px;font-weight:bold;height:50px;line-height:50px;width:100%;text-align:center;margin-top:80px;padding-bottom:80px;border-bottom:3px dashed #fff;}
+        .help-body {
+            margin-top:70px;
+            font-size:22px;
+            line-height: 25px;
+            text-align:center;
+        }
+        .help-body a{color:#fff;}
+    </style>
+</head>
+<body>
+    <div class="help-head">@Basis.Parse.Localization("error_405_title")</div>
+    <div class="help-body">
+        <label>@Basis.Parse.Localization("error_405_desc_2")</label>
+        <a href="javascript:m.back()">@Basis.Parse.Localization("com_back_history")</a>
+        <label style="font-weight:bold;">@Basis.Parse.Localization("com_or")</label>
+        <a href="~/">@Basis.Parse.Localization("com_back_to_main")</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,173 @@
+﻿@using mtopt.logic;
+@using mtopt.model.EntitySales;
+@{
+    ViewBag.Title = Basis.Parse.Localization("key45");
+    Layout = "~/Views/Shared/mst_main.cshtml";
+    //获取数据
+    member Member = ViewBag.Member;
+}
+@section head{
+    <style type="text/css">
+
+    </style>
+}
+<div class="mn-container">
+    <div class="row">
+        <div class="col-xs-2">
+            @{ Html.RenderPartial("~/Views/Shared/ctl_menu_user.cshtml"); }
+        </div>
+        <div class="col-xs-10">
+            <div class="content-layout">
+                <div class="mn-block asset-certificate-bottom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="~/User/basicedit">@Basis.Parse.Localization("key45")</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active">
+                            <form class="form-horizontal">
+                                <div class="row">
+                                    <div class="col-xs-2"><p class="mn-label right">@Basis.Parse.Localization("issue_new_account")</p></div>
+                                    <div class="col-xs-4">
+                                        <select id="bankid" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-2"><p class="mn-label right">@Basis.Parse.Localization("account_num")</p></div>
+                                    <div class="col-xs-4">
+                                        <input type="text" class="form-control" id="bankno" value="@Member.bankno" placeholder="@Basis.Parse.Localization("key46")">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-2"><p class="mn-label right">@Basis.Parse.Localization("bank_branch")</p></div>
+                                    <div class="col-xs-4">
+                                        <input type="text" class="form-control" id="bankname" value="@Member.bankname" placeholder="@Basis.Parse.Localization("key47")">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-2"><p class="mn-label right">@Basis.Parse.Localization("key48")</p></div>
+                                    <div class="col-xs-4">
+                                        <input type="text" class="form-control" id="email" value="@Member.email">
+                                    </div>
+                                </div>
+                              
+                                <div class="row">
+                                    <div class="col-xs-4 col-xs-offset-2"><a id="btn_enter" class="btn btn-block btn-orange">@Basis.Parse.Localization("key49")</a></div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var pck = {
+        //设置地址
+        setplace: function (selt, root, callback) {
+            if (root < 0) { return; }
+            engine.ajax.place(root, function (json) {
+                selt.html("");
+                selt.append("<option value=''>@Basis.Parse.Localization("com_option_default")</option>");
+                for (var i in json) {
+                    selt.append("<option value='" + json[i].id + "'>" + json[i].name + "</option>");
+                }
+                //是否调用回调
+                if (callback) { callback(); }
+            });
+        },
+        submit: function () {
+            var bankid = m.node("#bankid").value();
+            var bankno = m.node("#bankno").value();
+            var bankname = m.node("#bankname").value();
+            var email = m.node("#email").value();
+            //非空判断
+            if (bankid == null || bankid.length <= 0) {
+                engine.news("@Basis.Parse.Localization("com_choose_bank")", 1800);
+                return;
+            }
+            if (bankno.length <= 0) {
+                engine.news("@Basis.Parse.Localization("key46")", 1800);
+                return;
+            }
+            if (bankname.length <= 0) {
+                engine.news("@Basis.Parse.Localization("key47")", 1800);
+                return;
+            }
+            if (email.length <= 0) {
+                engine.news("@Basis.Parse.Localization("key50")", 1800);
+                return;
+            }
+           
+            var place = (place == -1) ? m.node("#province").value() : place;
+            engine.news("@Basis.Parse.Localization("com_processing_wait")", 999, 6);
+            //发送请求
+            var ajax = m.ajax("@Href("~/User/api_basicedit_submit")", null, function (jso) {
+                var jso = m.json.getObject(jso);
+                switch (jso.Error) {
+                    case 0:
+                        engine.news("@Basis.Parse.Localization("user_completed_change_info")", 3000);
+                        break;
+                    case -10002:
+                        engine.news("@Basis.Parse.Localization("user_failed_change_info")", 1800);
+                        break;
+                    case -10001:
+                        engine.news("@Basis.Parse.Localization("com_vcode_wrong")", 1800);
+                        break;
+                    default:
+                        engine.news("@Basis.Parse.Localization("com_connecting_server")", 1800);
+                        break;
+                }
+            });
+            ajax.data.add("bankid", bankid);
+            ajax.data.add("bankno", bankno);
+            ajax.data.add("bankname", bankname);
+            ajax.data.add("email", email);
+            ajax.send();
+        },
+        init: function () { }
+    }
+    pck.init();
+    //加载完
+    m.event("load").add(function () {
+        //获取银行
+        engine.ajax.bank(0, function (json) {
+            var selt = m.node("#bankid");
+            selt.html("");
+            for (var i in json) {
+                selt.append("<option value='" + json[i].id + "'>" + json[i].name + "</option>");
+            }
+            //获取地区
+            engine.ajax.place('001', function (json) {
+                var lt = m.node("#country");
+                lt.on("change", function () {
+                    pck.setplace(m.node("#province"), m.node("#country").value());
+                });
+                var ltpv = m.node("#province");
+                ltpv.on("change", function () {
+                    pck.setplace(m.node("#county"), m.node("#province").value());
+                });
+                //填充初始数据
+                lt.append("<option value=''>@Basis.Parse.Localization("com_option_default")</option>");
+                for (var i in json) {
+                    lt.append("<option value='" + json[i].id + "'>" + json[i].name + "</option>");
+                }
+                //设置默认值
+                m.node("#bankid").value(@Member.bankid);
+                lt.value('@(Member.placeid.Length >= 5 ? Member.placeid.Substring(0, 5) : "")');
+                pck.setplace(ltpv, '@(Member.placeid.Length >= 5 ? Member.placeid.Substring(0, 5) : "")', function () {
+                    ltpv.value('@(Member.placeid.Length >= 7 ? Member.placeid.Substring(0, 7) : "")');
+                });
+                pck.setplace(m.node("#county"), '@(Member.placeid.Length >= 7 ? Member.placeid.Substring(0, 7) : "")', function () {
+                    m.node("#county").value('@(Member.placeid.Length >= 9 ? Member.placeid.Substring(0, 9) : "")');
+                });
+            });
+        });
+    });
+    //载入时
+    m.event("ready").add(function () {
+        m.node("#btn_enter").click(pck.submit);
+        m.node(".mn-menu-user").addClass("active");
+        m.node(".user-menu-basicedit").addClass("active");
+    });
+</script>

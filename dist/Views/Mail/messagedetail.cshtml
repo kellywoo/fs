@@ -1,0 +1,106 @@
+﻿@using mtopt.model.EntitySales;
+@using mtopt.logic;
+@using System.Data;
+@{
+    message Message = ViewBag.Message;
+    ViewBag.Title = Basis.Parse.Localization("inquiry_detail");
+    Layout = "~/Views/Shared/mst_main.cshtml";
+}
+@section head{
+    <style type="text/css">
+        
+    </style>
+}
+<div class="mn-container">
+    <div class="row">
+        <div class="col-xs-2">
+            @{ Html.RenderPartial("~/Views/Shared/ctl_menu_user.cshtml"); }
+        </div>
+        <div class="col-xs-10">
+            <div class="content-layout">
+                <div class="mn-block asset-certificate-bottom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#">@ViewBag.Title</a></li>
+                    </ul>
+                    <div class="list-group" style="margin-top:1em;">
+                        <a href="#" class="list-group-item">
+                            <label style="font-weight:bold;" class="list-group-item-heading">@Message.memberid @Message.addtime.ToString("yy/MM/dd HH:mm:ss")</label>
+                            <p class="list-group-item-text">@Html.Raw(Message.content)</p>
+                        </a>
+                    </div>
+                    @foreach (message_talk Talk in Message.message_talk.OrderBy(w => w.addtime))
+                    {
+                        <div class="list-group">
+                            <a href="#" class="list-group-item">
+                                <label style="font-weight:bold;" class="list-group-item-heading">@Talk.author [@(Talk.message_talk_type.name)] @Talk.addtime.ToString("yy/MM/dd HH:mm:ss")</label>
+                                <p class="list-group-item-text">@Talk.content</p>
+                            </a>
+                        </div>
+                    }
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+                                <form name="form" method="post" enctype="multipart/form-data" action="@Href("~/Mail/api_message_submit")">
+                                    <fieldset>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">@Basis.Parse.Localization("inquiry_content")</label>
+                                            <div class="col-sm-10">
+                                                <textarea class="form-control" id="content" style="margin:0px;" rows="10"></textarea>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <div class="form-group">
+                                            <div class="col-sm-4 col-sm-offset-2">
+                                                <button type="button" id="btn_enter" class="btn btn-orange">@Basis.Parse.Localization("inquiry_publishing")</button>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var pck = {
+        submit: function () {
+            var content = m.node("#content").value();
+
+            if (content.length <= 0) {
+                engine.news("@Basis.Parse.Localization("inquiry_enter_content")", 1800);
+                return;
+            }
+            engine.news("@Basis.Parse.Localization("com_processing_wait")", 999, 6);
+            //发送请求
+            var ajax = m.ajax("@Href("~/Mail/api_messagedetail_submit")", null, function (jso) {
+                var jso = m.json.getObject(jso);
+                switch (jso.Error) {
+                    case 0:
+                        engine.news("@Basis.Parse.Localization("inquiry_answered")", 3000, true);
+                        m.reload();
+                        break;
+                    default:
+                        engine.news("@Basis.Parse.Localization("inquiry_pending")", 1800);
+                        break;
+                }
+            });
+            ajax.data.add("id", @Message.id);
+            ajax.data.add("content", content);
+            ajax.send();
+        },
+        init: function () 
+        { 
+            m.node(".mn-menu-user").addClass("active");
+            m.node(".user-menu-messagelists").addClass("active");
+        }
+    }
+    pck.init();
+    //载入时
+    $(function () {
+        m.node("#btn_enter").click(pck.submit);
+    });
+</script>

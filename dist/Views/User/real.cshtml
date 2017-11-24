@@ -1,0 +1,271 @@
+﻿@using mtopt.logic;
+@using mtopt.model.EntitySales;
+@using mtopt.rte.Encrypt;
+@{
+    ViewBag.Title = Basis.Parse.Localization("com_verifiable_name");
+    Layout = "~/Views/Shared/mst_main.cshtml";
+
+}
+@section head{
+    <style type="text/css">
+        .login-register {
+            background: url(/images/login-bg.jpg) no-repeat center;
+            background-size: cover;
+            height: 850px;
+        }
+
+        .form-login-register {
+            width: 440px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 118px;
+            height: 690px;
+            background: #fff;
+            box-shadow: 0 0 15px #ccc;
+            padding: 45px 45px 20px 45px;
+        }
+
+            .form-login-register h1 {
+                color: #ff9720;
+                margin: 0 0 45px 0;
+            }
+
+            .form-login-register .form-control, .form-login-register .form-control:focus {
+                border: none;
+                box-shadow: none;
+                border-bottom: 1px solid #d1d1d1;
+                border-radius: 0;
+                height: 45px;
+            }
+
+            .form-login-register p {
+                font-size: 12px;
+                color: #999;
+                margin-top: 20px;
+                margin-bottom: 15px;
+            }
+
+                .form-login-register p a {
+                    color: #ff9720;
+                }
+
+            .form-login-register.register, .form-login-register.reset-password {
+                height: 555px;
+                margin-top: 37px;
+            }
+
+            .form-login-register #sendSms {
+                top: 7px;
+                right: 0;
+            }
+
+            .form-login-register.reset-password button[type=submit] {
+                margin-top: 55px;
+            }
+
+        .upload-file .wrap {
+            width: 4em;
+            margin-bottom: 1em;
+        }
+
+        .upload-file .label {
+            color: #666;
+            width: 100%;
+            text-align: center;
+            margin-left: 4.4em;
+        }
+
+        .upload-file img {
+            width: 180px;
+            height: 90px;
+            border: 1px solid #ddd;
+        }
+    </style>
+}
+<div class="login-register">
+    <div class="mn-container">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-login-register login">
+                    <h1 class="center">@Basis.Parse.Localization("com_verifiable_name")</h1>
+                    <div class="form-group">
+                        <input type="text" id="username" class="form-control" placeholder="@Basis.Parse.Localization("com_enter_verifiable_name")">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="idcard" class="form-control" placeholder="@Basis.Parse.Localization("com_enter_social_number")">
+                    </div>
+                    @*<div class="form-group row" style="margin-bottom:50px">
+                        <div class="col-xs-7">
+                            <input id="checkcode" type="text" class="form-control" placeholder="@Basis.Parse.Localization("com_vcode")" required="required" />
+                        </div>
+                        <div class="col-xs-5">
+                            <input id="btn_sendcc" type="button" class="btn btn-success btn-lg" value="@Basis.Parse.Localization("com_vcode_send")" style="width:100%;" />
+                        </div>
+                    </div>*@
+                    <div class="input-group row" style="width:100%;">
+                        <div class="col-xs-6 upload-file">
+                            <div class="wrap">
+                                <div id="idcardz_pre">
+                                    <img id="idcardz_img" border="0" src="~/Images/photo-icon.png" width="180" height="90" onclick="$('#idcardz').click();">
+                                </div>
+                                <input type="file" onchange="pck.previewImage(this)" style="display: none;" id="idcardz">
+                                <div class="label">@Basis.Parse.Localization("identify_id_frontside")</div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 upload-file">
+                            <div class="wrap">
+                                <div id="idcardf_pre">
+                                    <img id="idcardf_img" border="0" src="~/Images/photo-icon.png" width="180" height="90" onclick="$('#idcardf').click();">
+                                </div>
+                                <input type="file" onchange="pck.previewImage(this)" style="display: none;" id="idcardf">
+                                <div class="label">@Basis.Parse.Localization("identify_id_backside")</div>
+                            </div>
+                        </div>
+                    </div>
+                    @if (Business.MemberReal.IsSubmit(Basis.Session.Uid) == true)
+                    {
+                        <button type="button" class="btn btn-orange btn-block btn-lg">@Basis.Parse.Localization("com_processing_wait")</button>
+                    }
+                        else
+                        {
+                        <button type="button" class="btn btn-orange btn-block btn-lg" onclick="pck.submit()">@Basis.Parse.Localization("com_verifiable_name")</button>
+                    }
+                    <p style="color:#fe3b1c">@Basis.Parse.Localization("identify_trouble_help")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var pck = {
+        submit: function () {
+            if (document.getElementById("username").value == "") {
+                engine.news("@Basis.Parse.Localization("com_enter_verifiable_name")", 3000);
+                return false;
+            }
+            var idcardreg = /^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/;
+            if (!idcardreg.test(document.getElementById("idcard").value)) {
+                engine.news("@Basis.Parse.Localization("identify_wrong_format")", 3000);
+                return false;
+            }
+            @*if (document.getElementById("checkcode").value == "") {
+                engine.news("@Basis.Parse.Localization("com_vcode_enter")", 3000);
+                return false;
+            }*@
+            if (document.getElementById("idcardz").value == "") {
+                engine.news("@Basis.Parse.Localization("identify_show_id_frontside")", 3000);
+                return false;
+            }
+            if (document.getElementById("idcardf").value == "") {
+                engine.news("@Basis.Parse.Localization("identify_show_id_backside")", 3000);
+                return false;
+            }
+            if (confirm("@Basis.Parse.ToLanguage("提交后将永久不可更改，是否提交?")")) {
+                engine.news("@Basis.Parse.Localization("com_upload_file")", 99999, 6);
+                $.ajax({
+                    url: '@Href("~/User/api_real_submit")',
+                    data: {
+                        idcard: document.getElementById("idcard").value,
+                        //checkcode: document.getElementById("checkcode").value,
+                        username: document.getElementById("username").value,
+                        idcardz: document.getElementById("idcardz_img").src,
+                        idcardf: document.getElementById("idcardf_img").src
+                    },
+                    type: 'post',
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        switch (data.Error) {
+                            case 0:
+                                engine.news("@Basis.Parse.Localization("com_complete_transferring")", 3000, true);
+                                m.reload();
+                                break;
+                            default:
+                                engine.news(data.Data, 1800);
+                                break;
+                        }
+                    },
+                    error: function () {
+                        engine.news("@Basis.Parse.Localization("com_failed_transferring")", 3000);
+                    }
+                });
+            }
+        },
+        previewImage: function (file) {
+            var div = document.getElementById(file.id + '_pre');
+            var MAXWIDTH = 180;
+            var MAXHEIGHT = 90;
+            /* 压缩图片 */
+            lrz(file.files[0], { width: 800 }).then(function (rst) {
+                /* 处理成功后执行 */
+                rst.formData.append('base64img', rst.base64); // 添加额外参数
+                var img = document.getElementById(file.id + '_img');
+                img.src = rst.base64;
+            }).catch(function (err) {
+                engine.news("@Basis.Parse.Localization("com_no_browser_support")", 3000);
+            }).always(function () {
+                /* 必然执行 */
+            })
+        },
+        init: function () {
+            /**********************判断返回值***********************/
+            if (m.queryString("data") != null) {
+                var data = m.json.getObject(m.encry.url.decode(m.queryString("data")));
+                switch (m.parse.toInteger(data.error)) {
+                    case 0:
+                        engine.news("@Basis.Parse.Localization("user_completed_change_info")", 1800);
+                        if (m.queryString("url") != null) {
+                            m.redirect(m.encry.url.decode(m.queryString("url")));
+                        }
+                        else {
+                            m.redirect("@Href("~/User/basicinfo")");
+                        }
+                        break;
+                    case -10001:
+                        engine.news("@Basis.Parse.Localization("user_failed_change_info")", 1800);
+                        break;
+                    default:
+                        engine.news(data.data, 1800);
+                        break;
+                }
+            }
+            m.node(".mn-menu-user").addClass("active");
+        }
+    }
+    pck.init();
+    /*******************绑定发送按钮********************/
+    m.node("#btn_sendcc").click(function () {
+        engine.news("@Basis.Parse.Localization("com_vcode_processing")", 99999, 6);
+        var jso = m.post("@Href("~/User/fixedsend?memberid=" + Basis.Session.Uid)", null);
+        jso = m.json.getObject(jso);
+        //判断返回值
+        switch (m.parse.toInteger(jso.Error)) {
+            case 0:
+                var btn = m.node("#btn_sendcc").first();
+                mSpace().cctime = 60;
+                //设置计时器
+                var itl = setInterval(function () {
+                    var sec = mSpace().cctime;
+                    if (sec > 0) {
+                        sec -= 1;
+                        btn.disabled = true;
+                        btn.value = "@Basis.Parse.Localization("com_wait")" + sec + "@Basis.Parse.Localization("com_seconds")";
+                    }
+                    else {
+                        btn.disabled = false;
+                        btn.value = "@Basis.Parse.Localization("com_vcode_request")";
+                        clearInterval(itl);
+                    }
+                    mSpace().cctime = sec;
+                }, 1000);
+                        engine.news("@Basis.Parse.Localization("com_complete_sending")", 3000);
+                break;
+            case -10001:
+            engine.news("@Basis.Parse.Localization("com_vcode_limited_time")", 3000);
+                break;
+            default:
+                engine.news("@Basis.Parse.Localization("com_failed")", 3000);
+                break;
+        }
+    });
+</script>

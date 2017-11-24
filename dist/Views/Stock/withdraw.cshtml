@@ -1,0 +1,117 @@
+﻿@using mtopt.logic;
+@using mtopt.model.EntitySales;
+@using mtopt.rte.Encrypt;
+@{
+    ViewBag.Title = Basis.Parse.Localization("withdraw_coin");
+    Layout = "~/Views/Shared/mst_main.cshtml";
+    //提取数据
+
+    member Member = ViewBag.Member;
+    stockmarket_account Account = ViewBag.Account;
+    stockmarket_type StockmarketType = ViewBag.StockmarketType;
+}
+@section head{
+    <style type="text/css">
+    </style>
+}
+<div class="mn-container">
+    <div class="row">
+        <div class="col-xs-2">
+            @{ Html.RenderPartial("~/Views/Shared/ctl_menu_user.cshtml"); }
+        </div>
+        <div class="col-xs-10">
+            <div class="content-layout">
+                <div class="mn-block asset-certificate-bottom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#">@Basis.Parse.Localization("withdraw_coin")</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active">
+                            <form class="form-horizontal">
+                                <div class="row">
+                                    <div class="col-xs-2"><p class="mn-label right">@Basis.Parse.Localization("com_withdraw_wallet_address")</p></div>
+                                    <div class="col-xs-4">
+                                        <input id="address" type="text" class="form-control" placeholder="@Basis.Parse.Localization("com_withdraw_wallet_address")" value="" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-2"><p class="mn-label right">@Basis.Parse.Localization("com_amount_withdraw")</p></div>
+                                    <div class="col-xs-4">
+                                        <input id="money" type="text" class="form-control" placeholder="@Basis.Parse.Localization("com_commission_to_withdraw")：@(StockmarketType.withdraw_rate)" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-2"><p class="mn-label right">@Basis.Parse.Localization("com_memo")</p></div>
+                                    <div class="col-xs-4">
+                                        <input id="remarks" type="text" class="form-control" placeholder="@Basis.Parse.Localization("com_memo")" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-4 col-xs-offset-2"><a id="btn_enter" class="btn btn-block btn-orange">@Basis.Parse.Localization("com_btn_submit")</a></div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var pck = {
+        menuid: "user",
+        title: "@Basis.Parse.Localization("withdraw_coin")",
+        submit: function () {
+            var address = m.node("#address").value();
+            var money = m.node("#money").value();
+            var remarks = m.node("#remarks").value();
+
+            if (address.length <= 0) {
+                engine.news("@Basis.Parse.Localization("key44")", 1800);
+                return;
+            }
+            if (money.length <= 0) {
+                engine.news("@Basis.Parse.Localization("com_withdrawl_price")", 1800);
+                return;
+            }
+            engine.news("@Basis.Parse.Localization("com_processing_wait")", 9999, 6);
+            //发送请求
+            var ajax = m.ajax("@Href("~/Stock/api_withdraw_submit")", null, function (jso) {
+                var jso = m.json.getObject(jso);
+                switch (jso.Error) {
+                    case 0:
+                        engine.news("@Basis.Parse.Localization("complete_withdraw")", 3000);
+                        break;
+                    case -10000:
+                        engine.news("@Basis.Parse.Localization("withdraw_failed_request")", 1800);
+                        break;
+                    default:
+                        engine.news(jso.Data, 2000);
+                        break;
+                }
+            });
+            ajax.data.add("accountid", @(Account.id));
+            ajax.data.add("address", address);
+            ajax.data.add("money", money);
+            ajax.data.add("remarks", remarks);
+            ajax.send();
+        },
+        init: function ()
+        {
+            m.node(".mn-menu-user").addClass("active");
+            m.node(".user-menu-stockwithdraw").addClass("active");
+        }
+    }
+    pck.init();
+    $(function () {
+        //获取银行
+        engine.ajax.bank(0, function (json) {
+            var selt = m.node("#bankid");
+            selt.html("");
+            for (var i in json) {
+                selt.append("<option value='" + json[i].id + "'>" + json[i].name + "</option>");
+            }
+        });
+        m.node("#btn_enter").click(pck.submit);
+    });
+</script>

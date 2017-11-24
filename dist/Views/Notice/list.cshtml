@@ -1,0 +1,145 @@
+﻿@using mtopt.logic;
+@using System.Data;
+@using mtopt.model.EntitySales;
+@using mtopt.rte.Encrypt;
+@{
+    ViewBag.Title = Basis.Parse.Localization("com_notice");
+    Layout = "~/Views/Shared/mst_main.cshtml";
+    IEnumerable<news> News = ViewBag.News;
+    
+}
+@section head{
+    <style type="text/css">
+        .content-layout{min-height:650px;}
+        .content-layout .thumbnail{height:350px;}
+        .content-layout img{width:100%;height:230px;}
+    </style>
+}
+<div class="mn-container" style="min-height:650px;">
+    <div class="content-layout">
+        <div class="mn-block asset-certificate-bottom">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="~#">@Basis.Parse.Localization("com_notice")</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <form class="form-horizontal">
+                        <div class="row" style="margin-top:1em;">
+                            @foreach (news New in News)
+                            {
+                                <div class="col-sm-6">
+                                    <a href="@Href(Basis.Url.ToNewsUrl(New.id))">
+                                        <div class="thumbnail">
+                                            <img src="@mtopt.logic.Basis.Url.ToIcon(New.icon, 400)" alt="...">
+                                            <div class="caption">
+                                                <h3>@(New.title)</h3>
+                                                <p>
+                                                    @{
+                                                        string Content = Basis.Gatekeeper.HtmlToText(New.content);
+                                                        Content = Content.Length > 50 ? Content.Substring(0, 50) : Content;
+                                                    <p style="color:#666;font-size:0.8em;">@(Content)...</p>
+                                                    }
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                            }
+                        </div>
+                        @{
+                            int Selected = Convert.ToInt32(ViewBag.Page) + 1;
+                            int Page = Convert.ToInt32(ViewBag.Count) / Convert.ToInt32(ViewBag.Size) + 1;
+                            int Size = 10;
+                            int PageFirst = 1;
+                            int PageLast = Size;
+                            //整理参数
+                            Page = (Page % 1) != 0 ? ((int)Page / 1) + 1 : Page;
+                            int Index = Size * (int)(Selected / Size);
+                            /****************************是否触发上一页**********************/
+                            if (Selected == PageFirst)
+                            {
+                                Index = Selected - Size + 1;
+                                Index = Index <= 0 ? 1 : Index;
+                            }
+                            /*********************是否触发下一页*****************************/
+                            else if (Selected == PageLast)
+                            {
+                                Index = Selected;
+                                Index = Index > Page ? Page : Index;
+                            }
+                            else
+                            {
+                                if (Selected == 1)
+                                {
+                                    Index = 1;
+                                }
+                                else if (Selected == Page)
+                                {
+                                    Index = Page - (Page % Size);
+                                }
+                            }
+                            PageFirst = Index;
+                            PageLast = Index + Page - 1;
+                            <center>
+                                <ul class="pagination" style="margin:0px;">
+                                    @if (Selected > 1)
+                                    {
+                                        <li><a href="~/Notice/list?page=@(Selected - 2)" class="btn btn-sm btn-alt">&laquo;</a></li>
+                                    }
+                                    @for (var i = 0; i < Size && (Index + i) <= Page; i++)
+                                    {
+                                        if ((Index + i) <= 0 || (Index + i) > Page)
+                                        {
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            //是否为选中标签
+                                            if (Selected == (Index + i))
+                                            {
+                                                <li><a href="~/Notice/list?page=@(Index + i - 1)" class="btn btn-sm btn-alt active">@(Index + i)</a></li>
+                                            }
+                                            else
+                                            {
+                                                <li><a href="~/Notice/list?page=@(Index + i - 1)" class="btn btn-sm btn-alt">@(Index + i)</a></li>
+                                            }
+                                        }
+                                    }
+                                    @if (Selected < Page - (Page % Size) + 1)
+                                    {
+                                        <li><a href="~/Notice/list?page=@(Selected)" class="btn btn-sm btn-alt">&raquo;</a></li>
+                                    }
+                                </ul>
+                            </center>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ <!--隐藏域开始-->
+<input type="hidden" class="HD_PAGE" value="@(ViewBag.Page)" />
+<input type="hidden" class="HD_SIZE" value="@(ViewBag.Size)" />
+<input type="hidden" class="HD_COUNT" value="@(ViewBag.Count)" />
+<input type="hidden" class="HD_CLASSIFY" value="@(ViewBag.ClassifyId)" />
+<!--隐藏域结束-->
+<script type="text/javascript">
+    var pck = {
+        menuid: "notice",
+        title: "@Basis.Parse.Localization("com_notice")",
+        page: 0,
+        size: 0,
+        count: 0,
+        classify: 0,
+        //加载页面
+        init: function () {
+            this.page = mtopt.parse.toInteger(m.node(".HD_PAGE").value());
+            this.size = mtopt.parse.toInteger(m.node(".HD_SIZE").value());
+            this.count = mtopt.parse.toInteger(m.node(".HD_COUNT").value());
+            this.classify = mtopt.parse.toInteger(m.node(".HD_CLASSIFY").value());
+            m.node(".mn-menu-notice").addClass("active");
+        }
+    }
+    pck.init();
+</script>

@@ -1,0 +1,120 @@
+﻿@using mtopt.logic;
+@using System.Data;
+@using mtopt.deal.web.App_Start;
+@{
+    Layout = null;
+    //获取数据
+    string Title = (ViewBag.Title == null || ViewBag.Title.Length <= 0) ? Basis.Parse.Localization("key17") : ViewBag.Title;
+    ViewData["keywords"] = ViewBag.Keywords;
+    ViewData["description"] = ViewBag.Description;
+    //获取信息
+    IEnumerable<mtopt.model.EntitySales.stockmarket_type> StockmarketTypes = Business.StockMarketTrend.GetTypes(0);
+}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    @{Html.RenderPartial("~/Views/Shared/ctl_keywords.cshtml"); }
+    <title>@(Title)</title>
+    <link href="@(Basis.GetCDN())/bootstrap-3.3.4/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="@(Basis.GetCDN())/bootstrap-slider/bootstrap-slider.min.css" rel="stylesheet" />
+    <link href="@(Basis.GetCDN())/forms.min/forms.min.css" rel="stylesheet" />
+    <link href="@(Basis.GetCDN())/jquery.banner/style.css" rel="stylesheet" />
+    <link href="~/Styles/engine.css" rel="stylesheet" />
+    @if (IsSectionDefined("head"))
+    { @RenderSection("head") }
+    <script type="text/javascript" src="@(Basis.GetCDN())/mtopt-3.0-min.js"></script>
+    <script type="text/javascript" src="@(Basis.GetCDN())/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="@(Basis.GetCDN())/bootstrap-3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="@(Basis.GetCDN())/jquery.banner/script.js"></script>
+    <script type="text/javascript" src="@(Basis.GetCDN())/forms.min/forms.min.js"></script>
+    <script type="text/javascript" src="@(Basis.GetCDN())/bootstrap-slider/bootstrap-slider.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/lrz.all.bundle.js"></script>
+    <script type="text/javascript" src="~/Scripts/engine.js"></script>
+    <script type="text/javascript">
+        function urlredirect() {
+            var sUserAgent = navigator.userAgent.toLowerCase();
+            if ((sUserAgent.match(/(ipod|iphone os|midp|ucweb|android|windows ce|windows mobile)/i))) {
+                window.location.href = "http://119.28.45.110:8072/";
+            }
+        }
+        urlredirect();
+    </script>
+</head>
+<body>
+    <div class="mn-header">
+        <div class="mn-container">
+            <div style="width:100%;">
+                <div class="div-block" style="width:25%;">
+                    <a href="/" class="mn-logo" title="@Basis.Parse.Localization("key18")"></a>
+                </div>
+                <div class="div-block" style="width:50%;">
+                    <div class="mn-menu">
+                        <ul class="mn-menu-ul">
+                            <li class="mn-menu-li mn-menu-stockmain">
+                                <a href="javascript:void()">@Basis.Parse.Localization("menu_trade_center")<span class="glyphicon glyphicon-chevron-down"></span><span class="glyphicon glyphicon-chevron-up"></span></a>
+                                <ul>
+                                    @foreach (mtopt.model.EntitySales.stockmarket_type StockmarketType in StockmarketTypes)
+                                    {
+                                        <li><a href="~/Stock/main?type=@(StockmarketType.id)"><img src="@(StockmarketType.icon)" style="width:18px;"><span>@(Basis.Parse.ToLanguage(StockmarketType.name)) (@StockmarketType.code)</span></a></li>
+                                    }
+                                </ul>
+                            </li>
+                            <li class="mn-menu-li mn-menu-notice"><a href="~/Notice/list">@Basis.Parse.Localization("menu_news")</a></li>
+                            <li class="mn-menu-li mn-menu-user"><a href="~/User/basicinfo">@Basis.Parse.Localization("menu_my_page")</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="div-block" style="margin-top:35px;right:0;position:absolute;">
+                    @if (Basis.Session.IsLogin)
+                    {
+                        <a onclick="engine.exit()" class="">@Basis.Parse.Localization("menu_logout")</a>
+                    }
+                    else
+                    {
+                        <a href="~/User/login" class="">@Basis.Parse.Localization("user_login")</a> <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span> <a href="~/User/register" class="">@Basis.Parse.Localization("user_signup")</a>
+                    }
+                    <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                    @if (Basis.Session.Language == 2)
+                    {
+                        <a onclick="engine.language(15)" class="">한국어</a>
+
+                    }
+                    else
+                    {
+                        <a onclick="engine.language(2)" class="">中國语</a>
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mn-content">
+        @RenderBody()
+    </div>
+    <div class="footer">
+        <div class="mn-footer" style="text-align:center">
+            <P><a href="">@Basis.Parse.Localization("menu_about_coorporation")</a> ㅣ <a href="">@Basis.Parse.Localization("menu_submit_certification")</a> ㅣ<a href="">@Basis.Parse.Localization("menu_usage_rule")</a> ㅣ<a href="">@Basis.Parse.Localization("menu_privacy")</a> | <a href="">@Basis.Parse.Localization("menu_customer_service")</a>ㅣ<a href="">@Basis.Parse.Localization("menu_site_map")</a></P>
+            <p> 주)Newlink</p>
+            <p>@Basis.Parse.Localization("footer_company_address")</p>
+            <p> @Basis.Parse.Localization("footer_advisory") 1644-7931 / help@cashierest.com @Basis.Parse.Localization("footer_business_hour") @Basis.Parse.Localization("com_workday") 10:00 ~ 17:00 (@Basis.Parse.Localization("footer_cs_notice"))</p>
+            <p>Copyright 2017 cashierest. ALL rights reserved.</p>
+        </div>
+    </div>
+    <input type="hidden" class="HD_SKEY" value="@Basis.Session.SKEY" />
+    <input type="hidden" class="HD_CKEY" value="@Basis.Session.CKEY" />
+    <input type="hidden" class="HD_IPADDRESS" value="@Basis.Session.IPAddress" />
+    <script type="text/javascript">
+        $(function () {
+            if (m.cache.get("iswarning") != "1") {
+                bealert.alert("@Basis.Parse.Localization("key19")", "<p style='text-align:left'>@Basis.Parse.Localization("key20")<p>", function () {
+                    m.cache.set("iswarning", "1");
+                }, { type: "warning", confirmButtonText: '@Basis.Parse.Localization("key21")', width: 400 });
+            }
+
+        });
+    </script>
+</body>
+</html>

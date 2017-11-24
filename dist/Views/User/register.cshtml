@@ -1,0 +1,154 @@
+﻿@using System.Data;
+@using mtopt.model;
+@using mtopt.logic;
+@using mtopt.model.EntitySales;
+@{
+    ViewBag.Title = Basis.Parse.Localization("user_signup");
+    Layout = "~/Views/Shared/mst_main.cshtml";
+}
+@section head{
+    <style type="text/css">
+        .login-register{background:url(/images/login-bg.jpg) no-repeat center;background-size:cover;height:720px}
+        .form-login-register{width:440px;margin-left:auto;margin-right:auto;margin-top:118px;height:724px;background:#fff;box-shadow:0 0 15px #ccc;padding:45px 45px 20px 45px}
+        .form-login-register h1{color:#e9504a;margin:0 0 45px 0}
+        .form-login-register .form-control,.form-login-register .form-control:focus{border:none;box-shadow:none;border-bottom:1px solid #d1d1d1;border-radius:0;height:45px}
+        .form-login-register.login input[type=password]{margin-bottom:50px}
+        .form-login-register p{font-size:12px;color:#999;margin-top:20px;margin-bottom:15px}
+        .form-login-register p a{color:#e9504a}
+        .form-login-register.register,.form-login-register.reset-password{height:555px;margin-top:37px}
+        .form-login-register #sendSms{top:7px;right:0}
+        .form-login-register.reset-password button[type=submit]{margin-top:55px}
+    </style>
+}
+<div class="login-register">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+
+                <form class="form-login-register register" style="margin-top:45px;height:600px;">
+                    <h1 class="center">@Basis.Parse.Localization("user_signup")</h1>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="moblie" placeholder="@Basis.Parse.Localization("user_cell_num")">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="recomid" placeholder="@Basis.Parse.Localization("user_reference")">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="password" placeholder="@Basis.Parse.Localization("user_enter_pw")">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="cpassword" placeholder="@Basis.Parse.Localization("user_enter_pwc")">
+                    </div>
+                    @*<div class="form-group row" style="margin-bottom:50px">
+                        <div class="col-xs-7">
+                            <input id="checkcode" type="text" class="form-control" placeholder="@Basis.Parse.Localization("com_vcode")" required="required" />
+                        </div>
+                        <div class="col-xs-5">
+                            <input id="btn_sendcc" type="button" class="btn btn-success btn-lg" value="@Basis.Parse.Localization("com_vcode_send")")" style="width:100%;" />
+                        </div>
+                    </div>*@
+                    <p>
+                        @Basis.Parse.Localization("user_signup_notice")<a target="_blank" href="~/Notice/detail?codeid=deal-zhuce">《@Basis.Parse.Localization("user_signup")》</a>
+                        <a href="~/User/register_emil">邮箱注册</a>
+                    </p>
+                    <a class="btn btn-orange btn-block btn-lg" id="btn_register">@Basis.Parse.Localization("user_signup_completed")</a>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var pck = {
+        init: function ()
+        {
+            m.node(".mn-menu-home").addClass("active");
+        }
+    }
+    pck.init();
+    m.node("#btn_register").click(function () {
+        engine.news("@Basis.Parse.Localization("user_signup_processing")", 99999, 6);
+        var moblie = m.node("#moblie").value();
+        var recomid = m.node("#recomid").value();
+        var password = m.node("#password").value();
+        var cpassword = m.node("#cpassword").value();
+        //var checkcode = m.node("#checkcode").value();
+        if (moblie.length <= 0) {
+            engine.news("@Basis.Parse.Localization("user_enter_cell_num")", 1800);
+            return;
+        }
+        if (password.length <= 0) {
+            engine.news("@Basis.Parse.Localization("com_enter_pw")", 1800);
+            return;
+        }
+        if (password != cpassword) {
+            engine.news("@Basis.Parse.Localization("user_pw_different")", 1800);
+            return;
+        }
+        var ajax = m.ajax("@Href("~/User/api_register_submit")", null, function (obj) {
+            var jso = m.json.getObject(obj);
+            if (jso.Success == true) {
+                engine.news("@Basis.Parse.Localization("user_complete_signup")", 99999, 6);
+                setTimeout(function () {
+                    if (m.queryString("url") != null) {
+                        m.redirect(m.encry.url.decode(m.queryString("url")));
+                    }
+                    else {
+                        m.redirect("@Href("~/User/login")");
+                    }
+                }, 1000);
+            }
+            else {
+                engine.news(jso.Data, 2000);
+            }
+        });
+        ajax.data.add("moblie", moblie);
+        ajax.data.add("password", password);
+        ajax.data.add("recomid", recomid);
+        ajax.data.add("checkcode", "");
+        ajax.send();
+    });
+    /*******************绑定发送按钮********************/
+    m.node("#btn_sendcc").click(function () {
+        var moblie = m.node("#moblie").value();
+        if (moblie.length <= 0) {
+            engine.news("@Basis.Parse.Localization("user_enter_cell_num")", 2000);
+            return;
+        }
+        engine.news("@Basis.Parse.Localization("com_vcode_processing")", 99999, 6);
+        var jso = m.post("@Href("~/User/everyonesend?moblie=")" + moblie, null);
+        jso = m.json.getObject(jso);
+        //判断返回值
+        switch (m.parse.toInteger(jso.Error)) {
+            case 0:
+                var btn = m.node("#btn_sendcc").first();
+                mSpace().cctime = 60;
+                //设置计时器
+                var itl = setInterval(function () {
+                    var sec = mSpace().cctime;
+                    if (sec > 0) {
+                        sec -= 1;
+                        btn.disabled = true;
+                        btn.value = "@Basis.Parse.Localization("com_wait")" + sec + "@Basis.Parse.Localization("com_seconds")";
+                    }
+                    else {
+                        btn.disabled = false;
+                        btn.value = "@Basis.Parse.Localization("com_vcode_request")";
+                        clearInterval(itl);
+                    }
+                    mSpace().cctime = sec;
+                }, 1000);
+                        engine.news("@Basis.Parse.Localization("com_complete_sending")", 3000);
+                break;
+            case -10001:
+            engine.news("@Basis.Parse.Localization("com_vcode_limited_time")", 3000);
+                break;
+            default:
+                engine.news("@Basis.Parse.Localization("com_failed")", 3000);
+                break;
+        }
+    });
+    m.node("#btn_login").click(function () {
+        m.redirect("@Href("~/User/login")");
+    });
+</script>

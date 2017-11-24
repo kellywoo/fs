@@ -1,0 +1,90 @@
+﻿@using mtopt.logic;
+@using mtopt.model.EntitySales;
+@{
+    Layout = "~/Views/Shared/mst_main.cshtml";
+    member_deal Deal = ViewBag.Deal;
+    ViewBag.Title = Basis.Parse.ToLanguage(Deal.title);
+}
+@section head{
+    <style type="text/css">
+        .td-title{text-align:right;width:10em;}
+        table td{text-align:left;}
+        table td:first-child{border-top:none;}
+    </style>
+}
+<div class="mn-container">
+    <div class="row">
+        <div class="col-xs-2">
+            @{ Html.RenderPartial("~/Views/Shared/ctl_menu_user.cshtml"); }
+        </div>
+        <div class="col-xs-10">
+            <div class="content-layout">
+                <div class="mn-block asset-certificate-bottom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#">@(ViewBag.Title)</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active">
+                            <form class="form-horizontal">
+                                <table class="table table-striped table-hover">
+                                    <thead class="mtablehead">
+                                        <tr>
+                                            <td class="td-title">@Basis.Parse.Localization("com_deal_id")：</td>
+                                            <td>@Deal.id</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="td-title">@Basis.Parse.Localization("com_title")：</td>
+                                            <td>@Deal.title</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="td-title">@Basis.Parse.Localization("com_deal_kinds")：</td>
+                                            <td>@Deal.member_deal_type.name</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="td-title">@Basis.Parse.Localization("com_deal_condition")：</td>
+                                            <td>@Deal.member_deal_state.name</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="td-title">@Basis.Parse.Localization("com_deal_addon")：</td>
+                                            <td>@Deal.explain</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="td-title">@Basis.Parse.Localization("com_memo")：</td>
+                                            <td>@Deal.remarks</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="td-title">@Basis.Parse.Localization("com_deal_price")：</td>
+                                            <td>@Deal.money.ToString("0.00")</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="td-title">@Basis.Parse.Localization("com_deal_status")：</td>
+                                            <td>@Deal.actual.ToString("0.00")</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="td-title">@Basis.Parse.Localization("com_deal_init_time")：</td>
+                                            <td>@Deal.addtime.ToString("yyyy/MM/dd HH:mm:ss")</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="td-title">@Basis.Parse.Localization("com_deal_alter_time")：</td>
+                                            <td>@Deal.altertime.ToString("yyyy/MM/dd HH:mm:ss")</td>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var pck = {
+        init: function () {
+
+            m.node(".mn-menu-user").addClass("active");
+            m.node(".user-menu-list").addClass("active");
+        }
+    }
+    pck.init();
+</script>

@@ -1,0 +1,43 @@
+﻿@using mtopt.logic;
+@{
+    ViewBag.Title = "ctl_menu_user";
+}
+<ul class="mn-sidebar">
+    <li class="active">
+        <span></span>
+        <a>@Basis.Parse.Localization("menu_asset_manage")</a>
+        <ul>
+            <li class="user-menu user-menu-basicinfo"><a href="~/User/basicinfo">@Basis.Parse.Localization("menu_wallet_manage")</a></li>
+            <li class="user-menu user-menu-deposit"><a href="~/Deal/deposit">@Basis.Parse.Localization("deposit_krw")</a></li>
+            <li class="user-menu user-menu-withdraw"><a href="~/Deal/withdraw">@Basis.Parse.Localization("com_cash_withdrawl")</a></li>
+            <li class="user-menu user-menu-transfer"><a href="~/Deal/transfer">@Basis.Parse.Localization("menu_transfer_to_member")</a></li>
+        </ul>
+    </li>
+    <li class="active">
+        <span></span>
+        <a>@Basis.Parse.Localization("menu_transfer_manage")</a>
+        <ul>
+            <li class="user-menu user-menu-stockdeposit"><a href="~/Stock/deposit">@Basis.Parse.Localization("menu_receive_coin")</a></li>
+            <li class="user-menu user-menu-stockwithdraw"><a href="~/Stock/withdraw">@Basis.Parse.Localization("menu_send_coin")</a></li>
+            <li class="user-menu user-menu-deallists"><a href="~/Stock/deallists">@Basis.Parse.Localization("menu_pending_trade")</a></li>
+            <li class="user-menu user-menu-turnoverlists"><a href="~/Stock/turnoverlists">@Basis.Parse.Localization("menu_trade_list")</a></li>
+        </ul>
+    </li>
+    <li class="active">
+        <span></span>
+        <a>@Basis.Parse.Localization("menu_my_page")</a>
+        <ul>
+            <li class="user-menu user-menu-basicedit"><a href="~/User/basicedit">@Basis.Parse.Localization("menu_edit_data")</a></li>
+            <li class="user-menu user-menu-wordedit"><a href="~/User/wordedit">@Basis.Parse.Localization("menu_change_pw")</a></li>
+            <li class="user-menu user-menu-list"><a href="~/Deal/list">@Basis.Parse.Localization("com_assets_list")</a></li>
+        </ul>
+    </li>
+    <li class="active">
+        <span></span>
+        <a>@Basis.Parse.Localization("menu_supports")</a>
+        <ul>
+            <li class="user-menu user-menu-message"><a href="~/Mail/message">@Basis.Parse.Localization("inquiry_title")</a></li>
+            <li class="user-menu user-menu-messagelists"><a href="~/Mail/messagelists">@Basis.Parse.Localization("menu_request_list")</a></li>
+        </ul>
+    </li>
+</ul>

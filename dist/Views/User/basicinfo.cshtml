@@ -1,0 +1,86 @@
+﻿@using System.Data;
+@using mtopt.model;
+@using mtopt.logic;
+@using mtopt.model.EntitySales;
+@{
+    ViewBag.Title = Basis.Parse.Localization("menu_my_page");
+    Layout = "~/Views/Shared/mst_main.cshtml";
+    //数据拉取
+    member Member = ViewBag.Member;
+    List<StockAccountModel> Accounts = ViewBag.Accounts;
+}
+@section head{
+    <style type="text/css">
+        .tab-content>.tab-pane{padding-top:20px}
+        .tab-content>.tab-pane.nopadding{padding:0}
+        .acount-item-ico{width:28px;height:28px;display:block;background-size:cover;background-position:center;background-repeat:no-repeat;background-size:100% auto;}
+        .alert{font-size:20px;font-weight:bold;height:100px;line-height:65px;position:relative;}
+    </style>
+}
+<div class="mn-container">
+    <div class="row">
+        <div class="col-xs-2">
+            @{ Html.RenderPartial("~/Views/Shared/ctl_menu_user.cshtml"); }
+        </div>
+        <div class="col-xs-10">
+            <div class="content-layout">
+                <div class="mn-block asset-certificate-bottom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#">@Basis.Parse.Localization("menu_wallet_manage")</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active">
+                            <form class="form-horizontal">
+                                <div class="alert alert-danger" role="alert">
+                                    @Basis.Parse.Localization("key54")：￥@(Business.StockMarketTrend.GetMemberTotal(Member.id).ToString("0.00"))
+                                </div>
+                                <table class="table table-striped table-hover center">
+                                    <thead class="mtablehead">
+                                        <tr>
+                                            <td colspan="2" style="width:200px;text-align:left;">@Basis.Parse.Localization("key55")</td>
+                                            <td>@Basis.Parse.Localization("key56")</td>
+                                            <td>@Basis.Parse.Localization("key24")</td>
+                                            <td>@Basis.Parse.Localization("key57")</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="record-list">
+                                        <tr>
+                                            <td style="width:40px">
+                                                <span class="acount-item-ico" style="background-image: url(/images/money.png);"></span>
+                                            </td>
+                                            <td style="text-align:left;">@Basis.Parse.Localization("key58") (RMB)</td>
+                                            <td>@(Member.money.ToString("0.00000"))</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        </tr>
+                                        @foreach (StockAccountModel Account in Accounts)
+                                        {
+                                            <tr>
+                                                <td style="width:40px">
+                                                    <span class="acount-item-ico" style="background-image: url(@(Account.Icon));"></span>
+                                                </td>
+                                                <td style="text-align:left;">@(Basis.Parse.ToLanguage(Account.Name)) (@(Account.Code))</td>
+                                                <td>@(Account.Amount.ToString("0.00000"))</td>
+                                                <td>@(Account.Price.ToString("0.00000"))</td>
+                                                <td>@((Account.Amount * Account.Price).ToString("0.00000"))</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var pck = {
+        init: function () {
+            m.node(".user-menu-basicinfo").addClass("active");
+            m.node(".mn-menu-user").addClass("active");
+        }
+    }
+    pck.init();
+</script>

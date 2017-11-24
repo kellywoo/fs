@@ -5,12 +5,12 @@ const INIT_DIR = './target'
 const lineReader = require('line-reader');
 const spreadsheet = require('google-spreadsheet');
 const creds = require('./client_secret.json');
-const doc = new spreadsheet('1v383oZPJLA216aCYnlP4GIAzJIXtSWjLP8wEQsbqf1g');
+const doc = new spreadsheet('1EFyxL44jfltcd5MfRJUgzRZiz7abVOD_3IH5iyx4hqY');
 const included = [ /\.js$/, /\.cshtml$/ ];
 const regx = /Basis.Parse.ToLanguage\("([^")]+)"\)/g;
 var data = {}
 var unlisted = {}
-const korean = require('./data.json');
+const web = require('./data-compare.json');
 
 function includes (p){
   return included.some((v) => p.toString().match(v));
@@ -58,18 +58,24 @@ function readDir (dirname) {
   })
 }
 //directory 내부의 파일 내에서 regex 검사
+function merge(to,from) {
+  for (var i in to) {
+    to[i] = from[i] || to[i]
+  }
+  return to;
+}
+
 function readFile (p) {
   var _filename = p.split(/\/+|\\+/g).slice(-2).join('/');
   return new Promise((resolve, reject) => {
     fs.readFile(p, 'utf-8', function (err, content) {
       if ( content ) {
         content.replace(regx, function (match, str) {
-          if ( data[ str ] ) {
-            data[ str ][ 'map' ].push(_filename);
-          } else {
-            unlisted[ str ] = unlisted[ str ] || { key: str, map: [] };
-            unlisted[ str ][ 'map' ].push(_filename);
+          data[ str ] =  data[ str ] || { map:[], cn : str, kr: '', key:'' };
+          if(web [ str ]) {
+            data[ str ] = merge(data[ str ], web[str]);
           }
+          data[ str ][ 'map' ].push(_filename);
         })
       }
       //file의 경우 무조건 false 로 directory는 path로 resolve 시킴
@@ -86,7 +92,9 @@ function readFromDictionary () {
       if ( _line.length && _line.split(':').length >= 2 && !_line.match(/^--/) ) {
         var cn = _line.split(':')[ 0 ];
         var kr = _line.split(':')[ 1 ];
-        data[ cn ] = { 'cn': cn, 'kr': kr, 'map': [] }
+        if(data[cn] && data[cn].kr === '') {
+          data[cn].kr = kr
+        }
       }
       if ( last ) {
         resolve('hello');
@@ -104,9 +112,9 @@ function readFromDir () {
       })
   })
 }
+
 //구글시트로 옮기기
 function toGoogleSheet (dic) {
-  console.log('dic', dic)
   return new Promise((resolve) => {
     doc.useServiceAccountAuth(creds, function (err) {
       let keys = Object.keys(dic);
@@ -133,20 +141,19 @@ function addRow (dic,keys, n) {
 }
 
 
-console.log(korean);
+// console.log(korean);
 
 function run () {
   //dictionary 부터 읽기
-  readFromDictionary()
+  readFromDir()
   //실제 사용된 내용 보기
     .then(() => {
-      return readFromDir()
+      return readFromDictionary()
     })
     .then(() => {
-      return toGoogleSheet(data);
-    })
-    .then((res) => {
-      console.log(res);
+    //console.log(data);
+    return toGoogleSheet(data);
     })
 }
-//run();
+
+run();
