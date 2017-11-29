@@ -7,7 +7,7 @@ const spreadsheet = require('google-spreadsheet');
 const creds = require('./client_secret.json');
 const doc = new spreadsheet('1v383oZPJLA216aCYnlP4GIAzJIXtSWjLP8wEQsbqf1g');
 const included = [ /\.js$/, /\.cshtml$/ ];
-const regx = /Basis.Parse.ToLanguage\("([^")]+)"\)/g;
+const regx = /Basis.Parse.Localization\("([^")]+)"\)/g;
 var data = {}
 var unlisted = {}
 
